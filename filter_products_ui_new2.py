@@ -46,18 +46,16 @@ def filter_data():
         filtered_df = filter_by_category(df, category_column_value, category_value)
 
         # Clear the Treeview
-        tree.delete(*tree.get_children())
+        for item in tree.get_children():
+            tree.delete(item)
 
         # Insert new rows into the Treeview
         if not filtered_df.empty:
-            # Set columns if not already set
-            if not tree["columns"]:
-                tree["columns"] = filtered_df.columns.tolist()
-                for col in filtered_df.columns:
-                    tree.heading(col, text=col, anchor="center")
-                    tree.column(col, anchor="w", width=20)  # Adjust width as needed
+            tree["columns"] = filtered_df.columns.tolist()
+            for col in filtered_df.columns:
+                tree.heading(col, text=col)
+                tree.column(col, anchor="center", width=100, stretch="NO")  # Fixed width for all columns
 
-            # Insert rows
             for index, row in filtered_df.iterrows():
                 tree.insert("", "end", values=row.tolist())
         else:
@@ -84,6 +82,10 @@ root = tk.Tk()
 root.title("Excel Category Filter")
 root.geometry("800x500")
 root.configure(bg="#f0f0f0")
+# root.resizable(width = 1, height = 1)
+# root.pack_propagate(0)
+# root.columnconfigure(0, weight=1)
+# root.rowconfigure(0, weight=1)
 
 # Create StringVar variables
 file_path = tk.StringVar()
@@ -119,21 +121,29 @@ tk.Label(root, text="Filtered Results:", bg="#f0f0f0", anchor="w").grid(row=3, c
 result_frame = tk.Frame(root, bg="white", relief="sunken", borderwidth=2)
 result_frame.grid(row=3, column=1, padx=10, pady=10, columnspan=3, sticky="nsew")
 
-# Create a horizontal scrollbar
-hsb = ttk.Scrollbar(result_frame, orient="horizontal")
-hsb.pack(side=tk.BOTTOM, fill='x')
+result_frame.columnconfigure(0, weight=1)
+result_frame.rowconfigure(0, weight=1)
 
-# Create a vertical scrollbar
-vsb = ttk.Scrollbar(result_frame, orient="vertical")
-vsb.pack(side=tk.RIGHT, fill='y')
+
 
 # Treeview for displaying results
-tree = ttk.Treeview(result_frame, columns=[], show='headings', yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+tree = ttk.Treeview(result_frame, columns=[], show='headings', selectmode="extended")
+scrollbar = ttk.Scrollbar(result_frame, orient=tk.HORIZONTAL,command=tree.xview)
+tree.configure(xscrollcommand=scrollbar.set, yscrollcommand=scrollbar.set)
 tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
 
+# Create vertical and horizontal scrollbars
+vsb = ttk.Scrollbar(result_frame, orient="vertical")
+vsb.pack(side=tk.RIGHT, fill='y', expand=False)
+
+hsb = ttk.Scrollbar(result_frame, orient="horizontal")
+hsb.pack(side=tk.BOTTOM, fill='x', expand=False)
+
+
+
 # Configure scrollbars
-vsb.config(command=tree.yview)
-hsb.config(command=tree.xview)
+# vsb.config(command=tree.yview)
+# hsb.config(command=tree.xview)
 
 # Ensure the scroll region is updated
 def update_scroll_region(event):
