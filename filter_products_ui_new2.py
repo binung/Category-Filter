@@ -55,7 +55,7 @@ def filter_data():
                 tree["columns"] = filtered_df.columns.tolist()
                 for col in filtered_df.columns:
                     tree.heading(col, text=col, anchor="center")
-                    tree.column(col, anchor="center", width=100)  # Adjust width as needed
+                    tree.column(col, anchor="w", width=20)  # Adjust width as needed
 
             # Insert rows
             for index, row in filtered_df.iterrows():
@@ -140,7 +140,6 @@ def update_scroll_region(event):
     tree.config(scrollregion=tree.bbox("all"))
 
 tree.bind("<Configure>", update_scroll_region)
-
 
 
 # Buttons
