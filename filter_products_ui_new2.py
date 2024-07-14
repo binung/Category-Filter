@@ -111,9 +111,10 @@ tk.Label(root, text="Category:", bg="#f0f0f0", anchor="w").grid(row=2, column=0,
 category_combobox = ttk.Combobox(root, width=common_width, justify='left')
 category_combobox.grid(row=2, column=1, padx=10, pady=10, sticky="ew")
 
+
 # Result frame
 tk.Label(root, text="Filtered Results:", bg="#f0f0f0", anchor="w").grid(row=3, column=0, padx=10, pady=10, sticky="ew")
-result_frame = tk.Frame(root, bg="white", relief="sunken", borderwidth=2)
+result_frame = tk.Frame(root, bg="white", relief="sunken", borderwidth=2, width=700, height=300)  # Fixed size
 result_frame.grid(row=3, column=1, padx=10, pady=10, columnspan=3, sticky="nsew")
 
 # Scrollbars
@@ -125,10 +126,14 @@ hsb.pack(side=tk.BOTTOM, fill='x')
 
 # Treeview for displaying results
 tree = ttk.Treeview(result_frame, columns=[], show='headings', yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)  # Set expand to False to maintain fixed size
 
 vsb.config(command=tree.yview)
 hsb.config(command=tree.xview)
+
+# Make sure to configure the Treeview with fixed height and width
+tree.bind("<Configure>", lambda e: tree.config(scrollregion=tree.bbox("all")))
+
 
 # Buttons
 button_frame = tk.Frame(root, bg="#f0f0f0")
