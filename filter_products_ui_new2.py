@@ -103,7 +103,7 @@ browse_button = tk.Button(file_frame, text="Browse", width=6, command=browse_fil
 browse_button.pack(side=tk.LEFT, expand=False)
 
 tk.Label(root, text="Category Column:", bg="#f0f0f0", anchor="w").grid(row=1, column=0, padx=10, pady=10, sticky="ew")
-column_combobox = ttk.Combobox(root, textvariable=category_column, width=common_width - 2, justify='left')
+column_combobox = ttk.Combobox(root, textvariable=category_column, width=common_width, justify='left')
 column_combobox.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
 column_combobox.bind("<<ComboboxSelected>>", update_categories)
 
@@ -117,6 +117,14 @@ tk.Label(root, text="Filtered Results:", bg="#f0f0f0", anchor="w").grid(row=3, c
 result_frame = tk.Frame(root, bg="white", relief="sunken", borderwidth=2, width=700, height=300)
 result_frame.grid(row=3, column=1, padx=10, pady=10, columnspan=3, sticky="nsew")
 
+# Avoid expansion in the grid
+result_frame.grid_propagate(False)  # Prevent the frame from resizing
+
+
+# Treeview for displaying results
+tree = ttk.Treeview(result_frame, columns=[], show='headings')
+tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
+
 # Scrollbars
 vsb = ttk.Scrollbar(result_frame, orient="vertical")
 vsb.pack(side=tk.RIGHT, fill='y')
@@ -124,19 +132,8 @@ vsb.pack(side=tk.RIGHT, fill='y')
 hsb = ttk.Scrollbar(result_frame, orient="horizontal")
 hsb.pack(side=tk.BOTTOM, fill='x')
 
-# Treeview for displaying results
-tree = ttk.Treeview(result_frame, columns=[], show='headings', yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
+tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
 
-# Fix width of Treeview columns
-tree.column("#0", width=700, stretch=tk.NO)  # Hide the first empty column
-
-# Set fixed width for columns
-def set_column_widths():
-    for col in tree["columns"]:
-        tree.column(col, width=700, anchor="center")
-
-tree.bind("<Configure>", lambda e: set_column_widths())
 
 vsb.config(command=tree.yview)
 hsb.config(command=tree.xview)
@@ -148,13 +145,12 @@ def update_scroll_region(event):
 tree.bind("<Configure>", update_scroll_region)
 
 
-
 # Buttons
 button_frame = tk.Frame(root, bg="#f0f0f0")
 button_frame.grid(row=5, column=1, columnspan=3, padx=10, pady=10, sticky="e")
 
-tk.Button(button_frame, text="Filter", command=filter_data, bg="#2196F3", fg="white").pack(side=tk.LEFT, padx=5)
-tk.Button(button_frame, text="Export to TXT", command=export_to_txt, bg="#FF9800", fg="white").pack(side=tk.LEFT, padx=5)
+tk.Button(button_frame, text="Filter", command=filter_data, bg="#2196F3", fg="white").pack(side=tk.LEFT, padx=5, expand=False)
+tk.Button(button_frame, text="Export to TXT", command=export_to_txt, bg="#FF9800", fg="white").pack(side=tk.LEFT, padx=5, expand=False)
 
 # Run the application
 root.mainloop()
