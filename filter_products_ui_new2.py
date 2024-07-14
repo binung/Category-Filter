@@ -97,10 +97,10 @@ file_frame = tk.Frame(root)
 file_frame.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
 
 file_entry = tk.Entry(file_frame, textvariable=file_path, width=common_width + 10, justify='left', font=('Arial', 10))
-file_entry.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+file_entry.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
 
-browse_button = tk.Button(file_frame, text="Browse", command=browse_file)
-browse_button.pack(side=tk.RIGHT)
+browse_button = tk.Button(file_frame, text="Browse", width=6, command=browse_file)
+browse_button.pack(side=tk.LEFT, expand=False)
 
 tk.Label(root, text="Category Column:", bg="#f0f0f0", anchor="w").grid(row=1, column=0, padx=10, pady=10, sticky="ew")
 column_combobox = ttk.Combobox(root, textvariable=category_column, width=common_width - 2, justify='left')
@@ -114,7 +114,7 @@ category_combobox.grid(row=2, column=1, padx=10, pady=10, sticky="ew")
 
 # Result frame
 tk.Label(root, text="Filtered Results:", bg="#f0f0f0", anchor="w").grid(row=3, column=0, padx=10, pady=10, sticky="ew")
-result_frame = tk.Frame(root, bg="white", relief="sunken", borderwidth=2, width=700, height=300)  # Fixed size
+result_frame = tk.Frame(root, bg="white", relief="sunken", borderwidth=2, width=700, height=300)
 result_frame.grid(row=3, column=1, padx=10, pady=10, columnspan=3, sticky="nsew")
 
 # Scrollbars
@@ -126,13 +126,27 @@ hsb.pack(side=tk.BOTTOM, fill='x')
 
 # Treeview for displaying results
 tree = ttk.Treeview(result_frame, columns=[], show='headings', yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)  # Set expand to False to maintain fixed size
+tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
+
+# Fix width of Treeview columns
+tree.column("#0", width=700, stretch=tk.NO)  # Hide the first empty column
+
+# Set fixed width for columns
+def set_column_widths():
+    for col in tree["columns"]:
+        tree.column(col, width=700, anchor="center")
+
+tree.bind("<Configure>", lambda e: set_column_widths())
 
 vsb.config(command=tree.yview)
 hsb.config(command=tree.xview)
 
-# Make sure to configure the Treeview with fixed height and width
-tree.bind("<Configure>", lambda e: tree.config(scrollregion=tree.bbox("all")))
+# Ensure the scroll region is updated
+def update_scroll_region(event):
+    tree.config(scrollregion=tree.bbox("all"))
+
+tree.bind("<Configure>", update_scroll_region)
+
 
 
 # Buttons
